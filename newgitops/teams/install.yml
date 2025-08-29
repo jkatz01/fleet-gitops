@@ -1,0 +1,130 @@
+agent_options:
+  config:
+    decorators:
+      load:
+      - SELECT uuid AS host_uuid FROM system_info;
+      - SELECT hostname AS hostname FROM system_info;
+    options:
+      disable_distributed: false
+      distributed_interval: 10
+      distributed_plugin: tls
+      distributed_tls_max_attempts: 3
+      logger_tls_endpoint: /api/osquery/log
+      logger_tls_period: 10
+      pack_delimiter: /
+  overrides:
+controls:
+  enable_disk_encryption: false
+  ios_updates:
+    deadline:
+    minimum_version:
+  ipados_updates:
+    deadline:
+    minimum_version:
+  macos_updates:
+    deadline:
+    minimum_version:
+  scripts:
+  windows_require_bitlocker_pin: false
+  windows_updates:
+    deadline_days:
+    grace_period_days:
+name: install
+policies:
+- calendar_events_enabled: false
+  conditional_access_enabled: false
+  critical: false
+  description: |-
+    Policy triggers automatic install of htop on each host that's missing this software.
+    Software won't be installed on Linux hosts with RPM-based distributions because this policy's query is written to always pass on these hosts.
+  install_software:
+    hash_sha256: 42725cc15e215e9286bf169fe734fbf47826dae209f319f6d0370cb950112fbf
+      # htop (htop_3.4.1-5_amd64.deb) version 3.4.1-5
+  name: '[Install software] htop (deb)'
+  platform: linux
+  query: "SELECT 1 \nWHERE \n  (SELECT COUNT(*) FROM deb_packages) = 0 \n  OR EXISTS
+    (\n    SELECT 1 \n    FROM deb_packages \n    WHERE name = 'htop' \n      AND
+    version_compare(version, '3.4.1-5') >= 0\n  );"
+  resolution:
+- calendar_events_enabled: false
+  conditional_access_enabled: false
+  critical: false
+  description: |-
+    Policy triggers automatic install of 2048 on each host that's missing this software.
+    Software won't be installed on Linux hosts with RPM-based distributions because this policy's query is written to always pass on these hosts.
+  install_software:
+    hash_sha256: dbe39f124d4f4ee5c440d42805681ba5f64fe23939f460b349735956152361a1
+      # 2048 (2048_0.20221023.1237-1_amd64.deb) version 0.20221023.1237-1
+  name: '[Install software] 2048 (deb)'
+  platform: linux
+  query: "SELECT 1 WHERE EXISTS (\n\tSELECT 1 WHERE (SELECT COUNT(*) FROM deb_packages)
+    = 0\n) OR EXISTS (\n\tSELECT 1 FROM deb_packages WHERE name = '2048' AND status
+    = 'install ok installed'\n);"
+  resolution:
+queries:
+software:
+  packages:
+  - hash_sha256: dbe39f124d4f4ee5c440d42805681ba5f64fe23939f460b349735956152361a1
+      # 2048 (2048_0.20221023.1237-1_amd64.deb) version 0.20221023.1237-1
+    install_script:
+      path: ../lib/install/scripts/2048-linux-install
+    uninstall_script:
+      path: ../lib/install/scripts/2048-linux-uninstall
+  - hash_sha256: 42725cc15e215e9286bf169fe734fbf47826dae209f319f6d0370cb950112fbf
+      # htop (htop_3.4.1-5_amd64.deb) version 3.4.1-5
+    install_script:
+      path: ../lib/install/scripts/htop-linux-install
+    uninstall_script:
+      path: ../lib/install/scripts/htop-linux-uninstall
+  - hash_sha256: 4ab078b549361aba143a9b5d42526c0bdb45b2c61776ec8b4754ea1fb694d8de
+      # 1Password (1Password-8.11.6-aarch64.zip) version 8.11.6
+    install_script:
+      path: ../lib/install/scripts/1password-darwin-install
+    uninstall_script:
+      path: ../lib/install/scripts/1password-darwin-uninstall
+    url: https://downloads.1password.com/mac/1Password-8.11.6-aarch64.zip
+  - hash_sha256: 63e014188725ba7e0608228393c0e2b7f0af9d00650fd2050ed8b07aaeba11a9
+      # PowerShell 7-preview-x86 (PowerShell-7.5.0-rc.1-win-x86.msi) version 7.5.0.101
+    install_script:
+      path: ../lib/install/scripts/powershell-7previewx86-windows-install
+    uninstall_script:
+      path: ../lib/install/scripts/powershell-7previewx86-windows-uninstall
+  - hash_sha256: 9344d713095ccff0829b6e2c83e75c3db0279eda0780eadfa287b510521a12b5
+      # ShareX (ShareX-18.0.1-setup.exe) version 18.0.1
+    install_script:
+      path: ../lib/install/scripts/sharex-windows-install
+    uninstall_script:
+      path: ../lib/install/scripts/sharex-windows-uninstall
+  - hash_sha256: 1ae92da05ccd27d40743b493f13d6cbf33e8d8cfa4e9ba1e9e9864d67e7b37d8
+      # TeamViewer (TeamViewer.pkg) version 15.68.6
+    install_script:
+      path: ../lib/install/scripts/teamviewer-darwin-install
+    uninstall_script:
+      path: ../lib/install/scripts/teamviewer-darwin-uninstall
+    url: https://dl.teamviewer.com/download/version_15x/update/15.68.6/TeamViewer.pkg
+  - hash_sha256: b989c9d09f070b03bfed0205b46ef5295d03f13b5e0c6a9114236d69c18b93af
+      # TeamViewer (TeamViewer_Setup_x64_15.68.6.exe) version 15.68.6
+    install_script:
+      path: ../lib/install/scripts/teamviewer-windows-install
+    uninstall_script:
+      path: ../lib/install/scripts/teamviewer-windows-uninstall
+    url: https://download.teamviewer.com/download/version_15x/TeamViewer_Setup_x64_15.68.6.exe
+team_settings:
+  features:
+    enable_host_users: true
+    enable_software_inventory: true
+  host_expiry_settings:
+    host_expiry_enabled: false
+    host_expiry_window: 0
+  integrations:
+    conditional_access_enabled:
+    google_calendar:
+  secrets:
+  - secret: $TEAM_ENROLL_SECRET
+  webhook_settings:
+    failing_policies_webhook:
+      destination_url:
+      enable_failing_policies_webhook: false
+      host_batch_size: 0
+      policy_ids:
+    host_status_webhook:

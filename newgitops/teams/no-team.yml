@@ -1,0 +1,45 @@
+controls:
+  enable_disk_encryption: false
+  ios_updates:
+    deadline:
+    minimum_version:
+  ipados_updates:
+    deadline:
+    minimum_version:
+  macos_migration:
+    enable: false
+    mode:
+    webhook_url:
+  macos_updates:
+    deadline:
+    minimum_version:
+  scripts:
+  windows_migration_enabled: false
+  windows_require_bitlocker_pin: false
+  windows_updates:
+    deadline_days:
+    grace_period_days:
+name: No team
+policies:
+software:
+  packages:
+  - hash_sha256: dbe39f124d4f4ee5c440d42805681ba5f64fe23939f460b349735956152361a1
+      # 2048 (2048_0.20221023.1237-1_amd64.deb) version 0.20221023.1237-1
+    install_script:
+      path: ../lib/no-team/scripts/2048-linux-install
+    uninstall_script:
+      path: ../lib/no-team/scripts/2048-linux-uninstall
+  - hash_sha256: e74e01ae264038994c6a7cbef03b9a45fcd955c39d0c562b47f38b11f0a3c0aa
+      # Brave (Brave-Browser-arm64.dmg) version 139.1.81.136
+    install_script:
+      path: ../lib/no-team/scripts/brave-darwin-install
+    uninstall_script:
+      path: ../lib/no-team/scripts/brave-darwin-uninstall
+    url: https://updates-cdn.bravesoftware.com/sparkle/Brave-Browser/stable-arm64/181.136/Brave-Browser-arm64.dmg
+team_settings:
+  webhook_settings:
+    failing_policies_webhook:
+      destination_url:
+      enable_failing_policies_webhook: false
+      host_batch_size: 0
+      policy_ids:
